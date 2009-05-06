@@ -26,7 +26,6 @@ end
 
 
 #see: http://pastie.org/469018
-
 #see: http://developer.apple.com/documentation/Cocoa/Conceptual/RubyPythonCocoa/Articles/UsingScriptingBridge.html
 #see: http://www.apple.com/applescript/features/scriptingbridge.html
 
