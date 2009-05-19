@@ -3,25 +3,21 @@ require 'hotcocoa'
 require 'hotcocoa/graphics'
 include HotCocoa
 include Graphics
+
 module CustomViewBehaviors
   def redraw
     needsDisplay = true
   end
   def drawRect(rect)
-#     NSColor.darkGrayColor.set
-#     NSRectFill(bounds)
-#    window.invalidateShadow
-    @frame_image ||= NSImage.imageNamed("frame.png")
-    @frame_image.drawAtPoint([0,0], fromRect:frame,
-        operation:NSCompositeSourceOver, fraction:1.0)
+    color(:rgb => 0x1e1422, :alpha => 0.9).set
+    clipShape=NSBezierPath.bezierPath
+    clipShape.appendBezierPathWithRoundedRect(bounds,
+      xRadius: 40, yRadius: 30)
+    clipShape.fill
     window.invalidateShadow
   end
 end
 module CustomWindowBehaviors
-  def initWithContentRect(contentRect,
-      styleMask:aStyle,backing:bufferingType,defer:flag)
-    super(contentRect,aStyle,NSBackingStoreBuffered,false)
-  end
   def canBecomeKeyWindow
     true
   end
@@ -44,31 +40,37 @@ module CustomWindowBehaviors
     loc
   end
 end
+
+def bezel_window(opts)
+  default_opts={:level=>NSStatusWindowLevel,:defer=>false,
+    :style=>[:borderless],:opaque=>false,:hasShadow=>true}
+  window(default_opts.merge(opts)) do |w|
+    w.setBackgroundColor(color(:name => 'clear'))
+    w.extend(CustomWindowBehaviors)
+    w.contentView.extend(CustomViewBehaviors)
+    w << l=layout_view(:layout=>{:expand =>[:width,:height]},
+      :frame => [0, 0, opts[:frame][2]/4, opts[:frame][3]/4])
+    yield l if block_given?
+  end
+end
+
 class Application
   include HotCocoa
-  FULL={:expand => [:width,:height]}
   def start
     application :name => "Report Bug" do |app|
       app.delegate = self
-      @main_window = window(:frame => [450,300,128,128],
-      :level=>NSStatusWindowLevel,:style=>[:borderless],
-      :alphaValue=>0.8,:opaque=>false,:hasShadow=>true
-      ) do |win|
-        win.setBackgroundColor(color(:name => 'clear'))
-        win.extend(CustomWindowBehaviors)
-        win.contentView.extend(CustomViewBehaviors)
-
-        win << layout_view(:layout => FULL,
-          :frame => [0, 0, 42, 42]) do |view|
-          view << bezelbutton("Bug",lambda { |s| sayit })
-          view << bezelbutton("Quit",lambda { |s| exit })
-        end
+      @main_window = bezel_window(
+        :frame => [450,300,128,128]) do |win|
+          win << bezel_button(:title=>"Bug",
+            :on_action=>lambda { |s| sayit })
+          win << bezel_button(:title=>"Quit",
+            :on_action=>lambda { |s| exit })
       end
     end
   end
-  def bezelbutton(title,act)
-    button(:bezel=>:recessed,:title=>title,:on_action=>act,
-      :layout => {:expand=>[:width],:start => false})
+  def bezel_button(opts)
+    button({:layout => {:expand=>[:width],:start => false},
+      :bezel=>:recessed}.merge(opts))
   end  
   def escape(string)
     string.gsub(/([^ a-zA-Z0-9_.-]+)/) do
