@@ -31,7 +31,7 @@ class Application
     showTimeline
   end
   def showTimeline()
-    twitter = TwitterApi.new(:username => 'kbrock', :password => )
+    twitter = TwitterApi.new(:username => 'kbrock', :password => '' )
     twitter.getTimeline(lambda { |data|
       write data.inspect
       File.open('/Users/kbrock/friends.json', 'w') { |f|
