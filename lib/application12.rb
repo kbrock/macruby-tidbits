@@ -9,18 +9,18 @@ class Application
       window(:title => "MyTableView",
         :frame => [10, 620, 330, 230]) do |win|
         win << split_view(:horizontal => true,
-          :layout => FULL) do |sv|
-          sv << scroll_view(:frame => SHOW) do |sc|
-            sc << @table=table_view(
+          :layout => FULL) do |sp|
+          sp << scroll_view(:frame => SHOW) do |sv|
+            sv << @table=table_view(
               :data => [], :columns => [
                 column(:id => :c1, :title => "Word 1"),
                 column(:id => :c2, :title => "Word 2"),
                 column(:id => :c3, :title => "...")])
-          end #sc
-          sv << @prompt = text_field(:text => 'type here',
+          end #sv
+          sp << @prompt = text_field(:text => 'type here',
             :font => font(:name=>'Monaco', :size => 16),
             :on_action => Proc.new {|t| type(t)})
-        end #sv
+        end #sp
         win.contentView.margin = 5
         win.makeFirstResponder @prompt
         win.will_close { exit }
