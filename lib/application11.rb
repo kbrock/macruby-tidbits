@@ -2,6 +2,16 @@ framework 'ScriptingBridge'
 require 'hotcocoa'
 require 'hotcocoa/graphics'
 include HotCocoa
+#temporary
+@safari = SBApplication.applicationWithBundleIdentifier('com.apple.Safari')
+@safari.classForScriptingClass('document').alloc.initWithProperties({:URL => 'http://www.yahoo.com'})
+
+
+SafariDocument.initWithProperties({:URL => 'http://www.yahoo.com', :source => '', :text => ''})
+
+#SafariDocument
+#@safari.documents << 
+
 require File.dirname(__FILE__)+"/bezel.rb";
 
 class Application
@@ -19,13 +29,15 @@ class Application
     end
   end
   def open_url(url)
-    make new document at end of documents
-    @safari.documents.
-    @safari.documents.first.url=url
     # tell application "Safari"
     #     make new document at end of documents
     #     set URL of first document to "http://www.google.com/"
     # end tell
+    
+    # #2: http://www.cocoadev.com/index.pl?ScriptingBridgeAndMail
+    #doc=@safari.classForScriptingClass('document').alloc.initWithProperties({:URL => 'http://www.yahoo.com'})
+    #@safari.documents.addObjects(doc)
+    @safari.documents.first.URL=url
   end
   def fill_field(field,value)
     safari_do "document.#{field}.value='#{value}'"
@@ -38,6 +50,8 @@ class Application
   end
   def doit
     @safari = SBApplication.applicationWithBundleIdentifier('com.apple.Safari')
+    #also have front document
+    open_url('http://www.google.com/')
     @google_tab=@safari.windows.first.currentTab
     fill_field "f.q","macruby"
     submit 'f'

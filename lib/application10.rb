@@ -54,6 +54,11 @@ def bezel_window(opts)
   end
 end
 
+def bezel_button(opts)
+  button({:layout => {:expand=>[:width],:start => false},
+    :bezel=>:recessed}.merge(opts))
+end  
+
 class Application
   include HotCocoa
   def start
@@ -68,10 +73,6 @@ class Application
       end
     end
   end
-  def bezel_button(opts)
-    button({:layout => {:expand=>[:width],:start => false},
-      :bezel=>:recessed}.merge(opts))
-  end  
   def escape(string)
     string.gsub(/([^ a-zA-Z0-9_.-]+)/) do
       $1.nil? ? nil : ('%' + $1.unpack('H2' * $1.bytesize).
