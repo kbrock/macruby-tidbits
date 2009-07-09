@@ -1,3 +1,4 @@
+require 'hotcocoa/graphics'
 include Graphics
 
 module CustomViewBehaviors
@@ -40,12 +41,20 @@ end
 def bezel_window(opts)
   default_opts={:level=>NSStatusWindowLevel,:defer=>false,
     :style=>[:borderless],:opaque=>false,:hasShadow=>true}
+  buttons=opts.delete(:buttons)
   window(default_opts.merge(opts)) do |w|
     w.setBackgroundColor(color(:name => 'clear'))
     w.extend(CustomWindowBehaviors)
     w.contentView.extend(CustomViewBehaviors)
     w << l=layout_view(:layout=>{:expand =>[:width,:height]},
       :frame => [0, 0, opts[:frame][2]/4, opts[:frame][3]/4])
+
+    if buttons
+      buttons.each do |n,v|
+        l << bezel_button(:title=>n, :on_action=>v)
+      end
+    end
+
     yield l if block_given?
   end
 end
